@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Playing Card Collection API</title>
+
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        background: #f4f6f8;
+        padding: 20px;
+    }
+
+    h2 {
+        text-align: center;
+    }
+
+    .container {
+        max-width: 700px;
+        margin: auto;
+        background: white;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+
+    input, button {
+        padding: 10px;
+        margin: 5px;
+        width: calc(100% - 22px);
+    }
+
+    button {
+        background: #007bff;
+        color: white;
+        border: none;
+        cursor: pointer;
+    }
+
+    button:hover {
+        background: #0056b3;
+    }
+
+    #output {
+        background: #111;
+        color: #00ff88;
+        padding: 10px;
+        height: 250px;
+        overflow-y: auto;
+        margin-top: 15px;
+        font-family: monospace;
+    }
+</style>
+</head>
+
+<body>
+
+<h2>🂡 Playing Card Collection (REST API)</h2>
+
+<div class="container">
+
+<h3>Add Card</h3>
+<input id="name" placeholder="Card Name (Ace)">
+<input id="suit" placeholder="Suit (Hearts)">
+<input id="value" placeholder="Value (1)">
+<button onclick="addCard()">Add Card</button>
+
+<h3>Update Card</h3>
+<input id="updateId" placeholder="Card ID">
+<input id="updateName" placeholder="New Name">
+<button onclick="updateCard()">Update Card</button>
+
+<h3>Delete Card</h3>
+<input id="deleteId" placeholder="Card ID">
+<button onclick="deleteCard()">Delete Card</button>
+
+<h3>View Cards</h3>
+<button onclick="getCards()">Get All Cards</button>
+
+<div id="output"></div>
+
+</div>
+
+<script>
+
+const API_URL = "http://localhost:3000/cards";
+
+function log(data) {
+    document.getElementById("output").innerText =
+        JSON.stringify(data, null, 2);
+}
+
+/* =========================
+   GET ALL CARDS
+========================= */
+async function getCards() {
+    const res = await fetch(API_URL);
+    const data = await res.json();
+    log(data);
+}
+
+/* =========================
+   ADD CARD
+========================= */
+async function addCard() {
+
+    const card = {
+        name: document.getElementById("name").value,
+        suit: document.getElementById("suit").value,
+        value: document.getElementById("value").value
+    };
+
+    const res = await fetch(API_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(card)
+    });
+
+    log(await res.json());
+}
+
+/* =========================
+   UPDATE CARD
+========================= */
+async function updateCard() {
+
+    const id = document.getElementById("updateId").value;
+
+    const res = await fetch(`${API_URL}/${id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+            name: document.getElementById("updateName").value
+        })
+    });
+
+    log(await res.json());
+}
+
+/* =========================
+   DELETE CARD
+========================= */
+async function deleteCard() {
+
+    const id = document.getElementById("deleteId").value;
+
+    const res = await fetch(`${API_URL}/${id}`, {
+        method: "DELETE"
+    });
+
+    log(await res.json());
+}
+
+</script>
+
+</body>
+</html>
